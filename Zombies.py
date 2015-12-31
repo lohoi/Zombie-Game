@@ -12,13 +12,29 @@ WIDTH = 700
 HEIGHT = 500
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self,position):
+    def __init__(self,position,fire_direction):
         super().__init__() 
         self.image = pygame.image.load("fireball1.png").convert()
+        self.image = pygame.transform.scale(self.image, [25,25])
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
-    def fire(self,screen):
-        screen.blit()
+        self.dir = 0
+        pos = [0 , 0]
+        pos[0] = position[0] +7
+        pos[1] = position[1] + 20
+        self.rect = pos
+        self.dir = fire_direction
+        
+    def update(self):
+        if self.dir == 0:
+           self.rect[1] += 1
+        elif self.dir == 1:
+            self.rect[0] += 1
+        elif self.dir == 2:
+           self.rect[1] -= 1
+        elif self.dir == 3:
+            self.rect[0] -= 1
+            
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -147,6 +163,8 @@ def main():
     Alby = Albert();
     all_sprites_list = pygame.sprite.Group()
     all_sprites_list.add(Alby)
+
+    fire_list = pygame.sprite.Group()
      
     # -------- Main Program Loop -----------
     while not done:
@@ -155,6 +173,8 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
                 break;
+            if event.type == pygame.KEYUP:
+                Alby.direction = IDLE
             if event.type == pygame.KEYDOWN:
                 if choose_character == True and event.key == pygame.K_RETURN:
                     choose_character = False;
@@ -168,9 +188,14 @@ def main():
                 elif event.key == pygame.K_UP:
                     Alby.direction = 2
                 elif event.key == pygame.K_LEFT:
-                    Alby.direction = 3                    
-            if event.type == pygame.KEYUP:
-                Alby.direction = IDLE
+                    Alby.direction = 3
+                elif event.key == pygame.K_SPACE:
+                    if Alby.direction == IDLE:
+                        fire = Projectile(Alby.rect,Alby.prev)
+                        fire_list.add(fire)
+                    else:    
+                        fire = Projectile(Alby.rect,Alby.direction)
+                        fire_list.add(fire)
             
                 
             
@@ -220,7 +245,8 @@ def main():
         else:
             screen.fill(WHITE)
             Alby.update_pos(screen)
-            #all_sprites_list.draw(screen)
+            fire_list.update()
+            fire_list.draw(screen)
      
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()

@@ -14,14 +14,15 @@ HEIGHT = 500
 class Projectile(pygame.sprite.Sprite):
     def __init__(self,position):
         super().__init__() 
-        self.left_fb1 = pygame.image.load("fireball1.png").convert()
-        self.left_fb1.set_colorkey(WHITE)
-        self.left_fb1_rect = self.left_fb1.get_rect()
+        self.image = pygame.image.load("fireball1.png").convert()
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
     def fire(self,screen):
         screen.blit()
 
-class Player():
+class Player(pygame.sprite.Sprite):
     def __init__(self):
+        super().__init__()
         self.timer = 0
 
     def spin(self,screen):
@@ -46,22 +47,35 @@ class Albert(Player):
         super().__init__()
         self.name = "Alby"
         
-        self.char_front = pygame.image.load("f_albwhite.png").convert()
-        self.char_front.set_colorkey(WHITE)
-        self.char_front = pygame.transform.scale(self.char_front, [50,50])
-    
+        self.image = pygame.image.load("f_albwhite.png").convert()
+        self.image.set_colorkey(WHITE)
+        self.image = pygame.transform.scale(self.image, [50,50])
+        self.rect = self.image.get_rect()
+
+        '''
         self.char_left = pygame.image.load("rl_alb.png").convert()
         self.char_left.set_colorkey(BLACK)
         self.char_left = pygame.transform.scale(self.char_left,[50,50])
+        self.left_rect = self.char_left.get_rect()
 
         self.char_right = pygame.transform.flip(self.char_left,True,False)
+        self.right_rect = self.char_right.get_rect()
 
         self.char_back = pygame.image.load("b_alb.png").convert()
         self.char_back.set_colorkey(BLACK)
         self.char_back = pygame.transform.scale(self.char_back,[50, 50])
+        self.back_rect = self.char_back.get_rect()
+        '''
 
         self.pos = [250, 250]
-        self.prev = 0
+        #self.prev = 0
+
+        self.rect = self.pos
+        '''
+        self.left_rect = self.pos
+        self.right_rect = self.pos
+        self.back_rect = self.pos
+        '''
         
         # -1 is a key to remember prev (for idle)
         # 0 for down
@@ -71,38 +85,45 @@ class Albert(Player):
         self.direction = 0;
     #end ctor()
 
-    def update_pos(self,screen):
+    def update_pos(self):
         if self.direction == 0:
             if self.pos[1] + 1 < HEIGHT - 50:
                 self.pos[1] += 1
-                self.prev = 0
-            screen.blit(self.char_front, self.pos)       
+                #self.prev = 0
+            #screen.blit(self.char_front, self.pos)
         elif self.direction == 1:
             if self.pos[0] + 1 < WIDTH - 50:
                 self.pos[0] += 1
-                self.prev = 1
-            screen.blit(self.char_right, self.pos)
+                #self.prev = 1
+            #screen.blit(self.char_right, self.pos)
         elif self.direction == 2:
             if self.pos[1] - 1 > 0:
                 self.pos[1] -= 1
-                self.prev = 2
-            screen.blit(self.char_back, self.pos)
+                #self.prev = 2
+            #screen.blit(self.char_back, self.pos)
         elif self.direction == 3:
             if self.pos[0] - 1 > 0:
                 self.pos[0] -= 1
-                self.prev = 3
-            screen.blit(self.char_left, self.pos)
-        else:
+                #self.prev = 3
+            #screen.blit(self.char_left, self.pos)
+        '''
+        #else:
             #if self.direction == IDLE:
-            if self.prev == 0:
-                screen.blit(self.char_front, self.pos)
-            elif self.prev == 1:
-                screen.blit(self.char_right, self.pos)
-            elif self.prev == 2:
-                screen.blit(self.char_back, self.pos)
-            else:
-                if self.prev == 3:
-                    screen.blit(self.char_left,self.pos)
+            #if self.prev == 0:
+                #screen.blit(self.char_front, self.pos)
+            #elif self.prev == 1:
+                #screen.blit(self.char_right, self.pos)
+            #elif self.prev == 2:
+                #screen.blit(self.char_back, self.pos)
+            #else:
+                #if self.prev == 3:
+                    #screen.blit(self.char_left,self.pos)
+        self.front_rect = self.pos
+        self.left_rect = self.pos
+        self.right_rect = self.pos
+        self.back_rect = self.pos
+        '''
+        self.rect = self.pos
                 
     # end update_pos()
 #end Albert()
@@ -137,6 +158,8 @@ def main():
     
     background_img = pygame.image.load("zombie.png").convert()
     Alby = Albert();
+    all_sprites_list = pygame.sprite.Group()
+    all_sprites_list.add(Alby)
      
     # -------- Main Program Loop -----------
     while not done:
@@ -202,15 +225,15 @@ def main():
             screen.fill(RED)
 
             name = Namefont.render(Alby.name,True,BLACK)
-            Alby.spin(screen)
+            #Alby.spin(screen)
             screen.blit(name,[285, 345])
             
 
         # Regular gameplay
         else:
             screen.fill(WHITE)
-            Alby.update_pos(screen)
-            
+            Alby.update_pos()
+            all_sprites_list.draw(screen)
      
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
@@ -224,4 +247,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -52,7 +52,7 @@ class Albert(Player):
         self.image = pygame.transform.scale(self.image, [50,50])
         self.rect = self.image.get_rect()
 
-        '''
+        
         self.char_left = pygame.image.load("rl_alb.png").convert()
         self.char_left.set_colorkey(BLACK)
         self.char_left = pygame.transform.scale(self.char_left,[50,50])
@@ -65,10 +65,10 @@ class Albert(Player):
         self.char_back.set_colorkey(BLACK)
         self.char_back = pygame.transform.scale(self.char_back,[50, 50])
         self.back_rect = self.char_back.get_rect()
-        '''
+        
 
         self.pos = [250, 250]
-        #self.prev = 0
+        self.prev = 0
 
         self.rect = self.pos
         '''
@@ -85,44 +85,37 @@ class Albert(Player):
         self.direction = 0;
     #end ctor()
 
-    def update_pos(self):
+    def update_pos(self,screen):
         if self.direction == 0:
             if self.pos[1] + 1 < HEIGHT - 50:
                 self.pos[1] += 1
-                #self.prev = 0
-            #screen.blit(self.char_front, self.pos)
+                self.prev = 0
+            screen.blit(self.image, self.pos)
         elif self.direction == 1:
             if self.pos[0] + 1 < WIDTH - 50:
                 self.pos[0] += 1
-                #self.prev = 1
-            #screen.blit(self.char_right, self.pos)
+                self.prev = 1
+            screen.blit(self.char_right, self.pos)
         elif self.direction == 2:
             if self.pos[1] - 1 > 0:
                 self.pos[1] -= 1
-                #self.prev = 2
-            #screen.blit(self.char_back, self.pos)
+                self.prev = 2
+            screen.blit(self.char_back, self.pos)
         elif self.direction == 3:
             if self.pos[0] - 1 > 0:
                 self.pos[0] -= 1
-                #self.prev = 3
-            #screen.blit(self.char_left, self.pos)
-        '''
-        #else:
-            #if self.direction == IDLE:
-            #if self.prev == 0:
-                #screen.blit(self.char_front, self.pos)
-            #elif self.prev == 1:
-                #screen.blit(self.char_right, self.pos)
-            #elif self.prev == 2:
-                #screen.blit(self.char_back, self.pos)
-            #else:
-                #if self.prev == 3:
-                    #screen.blit(self.char_left,self.pos)
-        self.front_rect = self.pos
-        self.left_rect = self.pos
-        self.right_rect = self.pos
-        self.back_rect = self.pos
-        '''
+                self.prev = 3
+            screen.blit(self.char_left, self.pos)
+        else:
+            if self.prev == 0:
+                screen.blit(self.image, self.pos)
+            elif self.prev == 1:
+                screen.blit(self.char_right, self.pos)
+            elif self.prev == 2:
+                screen.blit(self.char_back, self.pos)
+            else:
+                if self.prev == 3:
+                    screen.blit(self.char_left,self.pos)
         self.rect = self.pos
                 
     # end update_pos()
@@ -232,8 +225,8 @@ def main():
         # Regular gameplay
         else:
             screen.fill(WHITE)
-            Alby.update_pos()
-            all_sprites_list.draw(screen)
+            Alby.update_pos(screen)
+            #all_sprites_list.draw(screen)
      
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()

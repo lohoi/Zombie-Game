@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite):
 
     def spin(self,screen):
         if self.timer < 20:
-            screen.blit(self.char_front,[250, 250])
+            screen.blit(self.image,[250, 250])
         elif self.timer >= 20 and self.timer < 40:
             screen.blit(self.char_right,[250, 250])
         elif self.timer >= 40 and self.timer < 60:
@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
             screen.blit(self.char_left,[250, 250])
         else:
             self.timer = 0
-            screen.blit(self.char_front,[250, 250])
+            screen.blit(self.image,[250, 250])
         self.timer += 1
         return
     # end spin()
@@ -56,21 +56,16 @@ class Albert(Player):
         self.char_left = pygame.image.load("rl_alb.png").convert()
         self.char_left.set_colorkey(BLACK)
         self.char_left = pygame.transform.scale(self.char_left,[50,50])
-        self.left_rect = self.char_left.get_rect()
 
         self.char_right = pygame.transform.flip(self.char_left,True,False)
-        self.right_rect = self.char_right.get_rect()
 
         self.char_back = pygame.image.load("b_alb.png").convert()
         self.char_back.set_colorkey(BLACK)
         self.char_back = pygame.transform.scale(self.char_back,[50, 50])
-        self.back_rect = self.char_back.get_rect()
         
-
-        self.pos = [250, 250]
         self.prev = 0
 
-        self.rect = self.pos
+        self.rect = [250,250]
         '''
         self.left_rect = self.pos
         self.right_rect = self.pos
@@ -87,36 +82,35 @@ class Albert(Player):
 
     def update_pos(self,screen):
         if self.direction == 0:
-            if self.pos[1] + 1 < HEIGHT - 50:
-                self.pos[1] += 1
+            if self.rect[1] + 1 < HEIGHT - 50:
+                self.rect[1] += 1
                 self.prev = 0
-            screen.blit(self.image, self.pos)
+            screen.blit(self.image, self.rect)
         elif self.direction == 1:
-            if self.pos[0] + 1 < WIDTH - 50:
-                self.pos[0] += 1
+            if self.rect[0] + 1 < WIDTH - 50:
+                self.rect[0] += 1
                 self.prev = 1
-            screen.blit(self.char_right, self.pos)
+            screen.blit(self.char_right, self.rect)
         elif self.direction == 2:
-            if self.pos[1] - 1 > 0:
-                self.pos[1] -= 1
+            if self.rect[1] - 1 > 0:
+                self.rect[1] -= 1
                 self.prev = 2
-            screen.blit(self.char_back, self.pos)
+            screen.blit(self.char_back, self.rect)
         elif self.direction == 3:
-            if self.pos[0] - 1 > 0:
-                self.pos[0] -= 1
+            if self.rect[0] - 1 > 0:
+                self.rect[0] -= 1
                 self.prev = 3
-            screen.blit(self.char_left, self.pos)
+            screen.blit(self.char_left, self.rect)
         else:
             if self.prev == 0:
-                screen.blit(self.image, self.pos)
+                screen.blit(self.image, self.rect)
             elif self.prev == 1:
-                screen.blit(self.char_right, self.pos)
+                screen.blit(self.char_right, self.rect)
             elif self.prev == 2:
-                screen.blit(self.char_back, self.pos)
+                screen.blit(self.char_back, self.rect)
             else:
                 if self.prev == 3:
-                    screen.blit(self.char_left,self.pos)
-        self.rect = self.pos
+                    screen.blit(self.char_left,self.rect)
                 
     # end update_pos()
 #end Albert()
@@ -218,7 +212,7 @@ def main():
             screen.fill(RED)
 
             name = Namefont.render(Alby.name,True,BLACK)
-            #Alby.spin(screen)
+            Alby.spin(screen)
             screen.blit(name,[285, 345])
             
 

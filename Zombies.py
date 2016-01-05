@@ -1,4 +1,5 @@
 import pygame
+import random
  
 # Define some colors
 BLACK = (0, 0, 0)
@@ -13,28 +14,69 @@ HEIGHT = 500
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self,position,fire_direction):
-        super().__init__() 
-        self.image = pygame.image.load("fireball1.png").convert()
-        self.image = pygame.transform.scale(self.image, [25,25])
-        self.image.set_colorkey(WHITE)
-        self.rect = self.image.get_rect()
-        self.dir = 0
+        super().__init__()
+
+        direct = 0
+        direct = fire_direction
+        self.dir = direct
+        if self.dir == 0:
+            self.image = pygame.image.load("fireball1.png").convert()
+            self.image = pygame.transform.scale(self.image, [25, 25])
+            self.image.set_colorkey(WHITE)
+            self.image = pygame.transform.flip(self.image,True,True)
+            self.rect = self.image.get_rect()
+        elif self.dir == 1:
+            self.image = pygame.image.load("fireball1.png").convert()
+            self.image = pygame.transform.scale(self.image, [25, 25])
+            self.image.set_colorkey(WHITE)
+            self.image = pygame.transform.flip(self.image,True,False)
+            self.rect = self.image.get_rect()
+        else:# self.dir == 3:
+            self.image = pygame.image.load("fireball1.png").convert()
+            self.image = pygame.transform.scale(self.image, [25, 25])
+            self.image.set_colorkey(WHITE)
+            self.rect = self.image.get_rect()
+        
         pos = [0 , 0]
         pos[0] = position[0] +7
         pos[1] = position[1] + 20
+
+        self.dist = 0
         self.rect = pos
-        self.dir = fire_direction
+
         
     def update(self):
-        if self.dir == 0:
-           self.rect[1] += 1
+        if self.dist == 170:
+            self.kill()
+        elif self.dir == 0:
+           self.rect[1] += 2
         elif self.dir == 1:
-            self.rect[0] += 1
+            self.rect[0] += 2
         elif self.dir == 2:
-           self.rect[1] -= 1
+           self.rect[1] -= 2
         elif self.dir == 3:
-            self.rect[0] -= 1
-            
+            self.rect[0] -= 2
+
+        self.dist += 1
+
+    #end update()
+#end Projectile()
+
+class Zombie(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        pos = [0 , 0]
+        pos[0] = random.randrange(700) # x
+        pos[1] = random.randrange(500) # y
+        self.image = pygame.image.load("zombie1front.png").convert()
+        self.rect = self.image.get_rect()
+        
+    # end ctor
+
+    def update(self):
+        pos[0] +=1
+        pos[1] +=1
+    #end update()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -236,7 +278,7 @@ def main():
         elif choose_character:
             screen.fill(RED)
 
-            name = Namefont.render(Alby.name,True,BLACK)
+            name = Namefont.render(Alby.name, True, BLACK)
             Alby.spin(screen)
             screen.blit(name,[285, 345])
             

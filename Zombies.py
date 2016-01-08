@@ -167,22 +167,22 @@ class Albert(Player):
                 self.rect.y += 1.0
                 self.prev = 0
             screen.blit(self.image, self.rect)
-        elif keys_pressed[pygame.K_RIGHT]:
+        if keys_pressed[pygame.K_RIGHT]:
             if self.rect.x + 1 < WIDTH - 50:
                 self.rect.x += 1.0
                 self.prev = 1
             screen.blit(self.char_right, self.rect)
-        elif keys_pressed[pygame.K_UP]:
+        if keys_pressed[pygame.K_UP]:
             if self.rect.y - 1 > 0:
                 self.rect.y -= 1.0
                 self.prev = 2
             screen.blit(self.char_back, self.rect)
-        elif keys_pressed[pygame.K_LEFT]:
+        if keys_pressed[pygame.K_LEFT]:
             if self.rect.x - 1 > 0:
                 self.rect.x -= 1.0
                 self.prev = 3
             screen.blit(self.char_left, self.rect)
-        elif self.direction == IDLE:
+        if self.direction == IDLE:
             if self.prev == 0:
                 screen.blit(self.image, self.rect)
             elif self.prev == 1:

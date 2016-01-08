@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
  
 # Define some colors
 BLACK = (0, 0, 0)
@@ -42,20 +43,20 @@ class Projectile(pygame.sprite.Sprite):
         pos[1] = position[1] + 20
 
         self.dist = 0
-        self.rect = pos
-
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
         
     def update(self):
         if self.dist == 170:
             self.kill()
         elif self.dir == 0:
-           self.rect[1] += 2
+           self.rect.y += 2
         elif self.dir == 1:
-            self.rect[0] += 2
+            self.rect.x += 2
         elif self.dir == 2:
-           self.rect[1] -= 2
+           self.rect.y -= 2
         elif self.dir == 3:
-            self.rect[0] -= 2
+            self.rect.x -= 2
 
         self.dist += 1
 
@@ -69,14 +70,29 @@ class Zombie(pygame.sprite.Sprite):
         pos[0] = random.randrange(700) # x
         pos[1] = random.randrange(500) # y
         self.image = pygame.image.load("zombie1front.png").convert()
+        self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+
+        #self.player_pos[0] = Alby.rect.x
+        #self.player_pos[1] = Alby.rect.y
+
+        self.speed = 1
         
     # end ctor
-
-    def update(self):
-        pos[0] +=1
-        pos[1] +=1
+    
+    def update(self,Alby):
+        if self.rect.x < Alby.rect.x:
+            self.rect.x += 1
+        if self.rect.x > Alby.rect.x:
+            self.rect.x -= 1
+        if self.rect.y < Alby.rect.y:
+            self.rect.y += 1
+        if self.rect.y > Alby.rect.y:
+            self.rect.y -= 1
     #end update()
+#end Zombie()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -123,7 +139,8 @@ class Albert(Player):
         
         self.prev = 0
 
-        self.rect = [250,250]
+        self.rect.x = 250
+        self.rect.y = 250
         '''
         self.left_rect = self.pos
         self.right_rect = self.pos
@@ -140,23 +157,23 @@ class Albert(Player):
 
     def update_pos(self,screen):
         if self.direction == 0:
-            if self.rect[1] + 1 < HEIGHT - 50:
-                self.rect[1] += 1
+            if self.rect.y + 1 < HEIGHT - 50:
+                self.rect.y += 1
                 self.prev = 0
             screen.blit(self.image, self.rect)
         elif self.direction == 1:
-            if self.rect[0] + 1 < WIDTH - 50:
-                self.rect[0] += 1
+            if self.rect.x + 1 < WIDTH - 50:
+                self.rect.x += 1
                 self.prev = 1
             screen.blit(self.char_right, self.rect)
         elif self.direction == 2:
-            if self.rect[1] - 1 > 0:
-                self.rect[1] -= 1
+            if self.rect.y - 1 > 0:
+                self.rect.y -= 1
                 self.prev = 2
             screen.blit(self.char_back, self.rect)
         elif self.direction == 3:
-            if self.rect[0] - 1 > 0:
-                self.rect[0] -= 1
+            if self.rect.x - 1 > 0:
+                self.rect.x -= 1
                 self.prev = 3
             screen.blit(self.char_left, self.rect)
         else:
@@ -199,7 +216,8 @@ def main():
     Authorfont = pygame.font.SysFont('Calibri',30,False,True)
     Namefont = pygame.font.SysFont('Calibri', 20, False,False)
     Startfont = pygame.font.SysFont('Arial', 30, True, False)
-    
+
+    rounds = 0
     
     background_img = pygame.image.load("zombie.png").convert()
     Alby = Albert();
@@ -207,6 +225,7 @@ def main():
     all_sprites_list.add(Alby)
 
     fire_list = pygame.sprite.Group()
+    zombie_list = pygame.sprite.Group()
      
     # -------- Main Program Loop -----------
     while not done:
@@ -244,6 +263,10 @@ def main():
 
         # --- Game logic should go here
         
+        if rounds < 10:
+            testzombie = Zombie()
+            zombie_list.add(testzombie)
+        rounds += 1
      
         # --- Screen-clearing code goes here
      
@@ -289,6 +312,15 @@ def main():
             Alby.update_pos(screen)
             fire_list.update()
             fire_list.draw(screen)
+            zombie_list.update(Alby)
+            zombie_list.draw(screen)
+        
+            pygame.sprite.groupcollide(zombie_list, fire_list,True,True)
+
+            for zombie in zombie_list:
+                if Alby.rect.colliderect(zombie):
+                    print("YOU LOSE!")
+                    done = True
      
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()

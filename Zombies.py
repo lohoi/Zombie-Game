@@ -38,7 +38,7 @@ class Projectile(pygame.sprite.Sprite):
             self.image.set_colorkey(WHITE)
             self.rect = self.image.get_rect()
         
-        pos = [0 , 0]
+        pos = [0.0 , 0.0]
         pos[0] = position[0] +7
         pos[1] = position[1] + 20
 
@@ -50,15 +50,15 @@ class Projectile(pygame.sprite.Sprite):
         if self.dist == 170:
             self.kill()
         elif self.dir == 0:
-           self.rect.y += 2
+           self.rect.y += 3
         elif self.dir == 1:
-            self.rect.x += 2
+            self.rect.x += 3
         elif self.dir == 2:
-           self.rect.y -= 2
+           self.rect.y -= 3
         elif self.dir == 3:
-            self.rect.x -= 2
+            self.rect.x -= 3
 
-        self.dist += 1
+        self.dist += 3
 
     #end update()
 #end Projectile()
@@ -66,9 +66,9 @@ class Projectile(pygame.sprite.Sprite):
 class Zombie(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        pos = [0 , 0]
-        pos[0] = random.randrange(700) # x
-        pos[1] = random.randrange(500) # y
+        pos = [0.0 , 0.0]
+        pos[0] = random.uniform(0.0,700)  # x
+        pos[1] = random.uniform(0.0,500) # y
         self.image = pygame.image.load("zombie1front.png").convert()
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
@@ -78,19 +78,24 @@ class Zombie(pygame.sprite.Sprite):
         #self.player_pos[0] = Alby.rect.x
         #self.player_pos[1] = Alby.rect.y
 
-        self.speed = 1
+        self.speed = .5
         
     # end ctor
-    
-    def update(self,Alby):
-        if self.rect.x < Alby.rect.x:
-            self.rect.x += 1
-        if self.rect.x > Alby.rect.x:
-            self.rect.x -= 1
-        if self.rect.y < Alby.rect.y:
-            self.rect.y += 1
-        if self.rect.y > Alby.rect.y:
-            self.rect.y -= 1
+
+    # loses precision if speed is not an integer
+    def update(self,num):
+        if self.rect.x < num.x:
+            self.rect.x += self.speed
+        if self.rect.x > num.x:
+            self.rect.x -= self.speed
+        if self.rect.y < num.y:
+            self.rect.y += self.speed
+        if self.rect.y > num.y:
+            self.rect.y -= self.speed
+
+        #print(type(self.rect.x))
+        #print(type(num.x))
+        
     #end update()
 #end Zombie()
 
@@ -141,6 +146,7 @@ class Albert(Player):
 
         self.rect.x = 250
         self.rect.y = 250
+        print(type(self.rect.x))
         '''
         self.left_rect = self.pos
         self.right_rect = self.pos
@@ -155,28 +161,28 @@ class Albert(Player):
         self.direction = 0;
     #end ctor()
 
-    def update_pos(self,screen):
-        if self.direction == 0:
+    def update_pos(self,screen,keys_pressed):
+        if keys_pressed[pygame.K_DOWN]:
             if self.rect.y + 1 < HEIGHT - 50:
-                self.rect.y += 1
+                self.rect.y += 1.0
                 self.prev = 0
             screen.blit(self.image, self.rect)
-        elif self.direction == 1:
+        elif keys_pressed[pygame.K_RIGHT]:
             if self.rect.x + 1 < WIDTH - 50:
-                self.rect.x += 1
+                self.rect.x += 1.0
                 self.prev = 1
             screen.blit(self.char_right, self.rect)
-        elif self.direction == 2:
+        elif keys_pressed[pygame.K_UP]:
             if self.rect.y - 1 > 0:
-                self.rect.y -= 1
+                self.rect.y -= 1.0
                 self.prev = 2
             screen.blit(self.char_back, self.rect)
-        elif self.direction == 3:
+        elif keys_pressed[pygame.K_LEFT]:
             if self.rect.x - 1 > 0:
-                self.rect.x -= 1
+                self.rect.x -= 1.0
                 self.prev = 3
             screen.blit(self.char_left, self.rect)
-        else:
+        elif self.direction == IDLE:
             if self.prev == 0:
                 screen.blit(self.image, self.rect)
             elif self.prev == 1:
@@ -216,8 +222,6 @@ def main():
     Authorfont = pygame.font.SysFont('Calibri',30,False,True)
     Namefont = pygame.font.SysFont('Calibri', 20, False,False)
     Startfont = pygame.font.SysFont('Arial', 30, True, False)
-
-    rounds = 0
     
     background_img = pygame.image.load("zombie.png").convert()
     Alby = Albert();
@@ -235,7 +239,7 @@ def main():
                 done = True
                 break;
             if event.type == pygame.KEYUP:
-                Alby.direction = IDLE
+                 Alby.direction = IDLE
             if event.type == pygame.KEYDOWN:
                 if choose_character == True and event.key == pygame.K_RETURN:
                     choose_character = False;
@@ -257,16 +261,12 @@ def main():
                     else:    
                         fire = Projectile(Alby.rect,Alby.direction)
                         fire_list.add(fire)
+
+            keys_pressed = pygame.key.get_pressed()
             
-                
             
 
         # --- Game logic should go here
-        
-        if rounds < 10:
-            testzombie = Zombie()
-            zombie_list.add(testzombie)
-        rounds += 1
      
         # --- Screen-clearing code goes here
      
@@ -309,10 +309,10 @@ def main():
         # Regular gameplay
         else:
             screen.fill(WHITE)
-            Alby.update_pos(screen)
+            Alby.update_pos(screen,keys_pressed)
             fire_list.update()
             fire_list.draw(screen)
-            zombie_list.update(Alby)
+            zombie_list.update(Alby.rect)
             zombie_list.draw(screen)
         
             pygame.sprite.groupcollide(zombie_list, fire_list,True,True)

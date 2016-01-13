@@ -297,7 +297,7 @@ def main():
             title = Titlefont.render("Zombie Game",True, BLACK)
             screen.blit(title, [60, 100])
             
-            authors = Authorfont.render("Albert Lo", True, BLACK)
+            authors = Authorfont.render("Created by Chris Quinones and Albert Lo", True, BLACK)
             illustrator = Authorfont.render("Player Sprite Art by Doug Wu", True,BLACK)
             screen.blit(authors, [60,150])
             screen.blit(illustrator, [60,175])
@@ -313,6 +313,10 @@ def main():
             Alby.spin(screen)
             screen.blit(instruct, [10,10])
             screen.blit(instructions, [10,40])
+
+            start = Startfont.render("Hit Start to Play",True, WHITE) 
+            screen.blit(start,[75,400])
+            
             screen.blit(name,[260, 305])
             
 
@@ -321,12 +325,27 @@ def main():
             screen.fill(RED)
             point_print = Namefont.render("Number of zombies killed: " +str(points) ,True,BLACK)
             screen.blit(point_print, [10, 10])
+
+            restart_print = Namefont.render("Hit enter to try again",True,BLACK)
+            screen.blit(restart_print, [50, 50])
+
+            if keys_pressed[pygame.K_RETURN]:
+                intro_trigger = True
+                choose_character = False
+                zombie_list = zombie_list = pygame.sprite.Group()
+                end_scene = False
+                fire_list = pygame.sprite.Group()
+                indexer = 1
+                time_indexer = 0
+                points = 0
+                continue
+                
             
         else:
             if (time_indexer == 0):
                 for i in range(indexer):
                     test = Zombie()
-                    while(test.rect.x - Alby.rect.x < 25 and test.rect.y - Alby.rect.y < 25):
+                    while(abs(test.rect.x - Alby.rect.x) < 200 or abs(test.rect.y - Alby.rect.y) < 200):
                         test.rect.x = random.uniform(0.0,700) # x
                         test.rect.y = random.uniform(0.0,500) # y
                     zombie_list.add(Zombie())

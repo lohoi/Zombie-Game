@@ -67,8 +67,10 @@ class Zombie(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         pos = [0.0 , 0.0]
+
         pos[0] = random.uniform(0.0,700)  # x
         pos[1] = random.uniform(0.0,500) # y
+        
         self.image = pygame.image.load("zombie1front.png").convert()
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
@@ -78,7 +80,7 @@ class Zombie(pygame.sprite.Sprite):
         #self.player_pos[0] = Alby.rect.x
         #self.player_pos[1] = Alby.rect.y
 
-        self.speed = .5
+        self.speed = 1
         
     # end ctor
 
@@ -163,26 +165,26 @@ class Albert(Player):
 
     def update_pos(self,screen,keys_pressed):
         if keys_pressed[pygame.K_DOWN]:
-            if self.rect.y + 1 < HEIGHT - 50:
-                self.rect.y += 1.0
+            if self.rect.y + 2 < HEIGHT - 50:
+                self.rect.y += 2.0
                 self.prev = 0
             screen.blit(self.image, self.rect)
-        if keys_pressed[pygame.K_RIGHT]:
-            if self.rect.x + 1 < WIDTH - 50:
-                self.rect.x += 1.0
+        elif keys_pressed[pygame.K_RIGHT]:
+            if self.rect.x + 2 < WIDTH - 50:
+                self.rect.x += 2.0
                 self.prev = 1
             screen.blit(self.char_right, self.rect)
-        if keys_pressed[pygame.K_UP]:
-            if self.rect.y - 1 > 0:
-                self.rect.y -= 1.0
+        elif keys_pressed[pygame.K_UP]:
+            if self.rect.y - 2 > 0:
+                self.rect.y -= 2.0
                 self.prev = 2
             screen.blit(self.char_back, self.rect)
-        if keys_pressed[pygame.K_LEFT]:
-            if self.rect.x - 1 > 0:
-                self.rect.x -= 1.0
+        elif keys_pressed[pygame.K_LEFT]:
+            if self.rect.x - 2 > 0:
+                self.rect.x -= 2.0
                 self.prev = 3
             screen.blit(self.char_left, self.rect)
-        if self.direction == IDLE:
+        elif self.direction == IDLE:
             if self.prev == 0:
                 screen.blit(self.image, self.rect)
             elif self.prev == 1:
@@ -191,8 +193,7 @@ class Albert(Player):
                 screen.blit(self.char_back, self.rect)
             else:
                 if self.prev == 3:
-                    screen.blit(self.char_left,self.rect)
-                
+                    screen.blit(self.char_left,self.rect)  
     # end update_pos()
 #end Albert()
       
@@ -230,6 +231,11 @@ def main():
 
     fire_list = pygame.sprite.Group()
     zombie_list = pygame.sprite.Group()
+
+    indexer = 1
+    time_indexer = 0
+    points = 0
+    end_scene = False
      
     # -------- Main Program Loop -----------
     while not done:
@@ -280,7 +286,6 @@ def main():
         # Intro Page
         if intro_trigger:
             screen.blit(background_img, [0,0])
-
             if flickr_count < 20:
                 start = Startfont.render("Hit Start to Play",True, WHITE) 
                 screen.blit(start,[75,400])
@@ -289,11 +294,11 @@ def main():
                 flickr_count +=1
                 if flickr_count > 30:
                     flickr_count = 0
-            title = Titlefont.render("Insert Name Here",True, BLACK)
+            title = Titlefont.render("Zombie Game",True, BLACK)
             screen.blit(title, [60, 100])
             
-            authors = Authorfont.render("Created by Chris Quinones and Albert Lo", True, BLACK)
-            illustrator = Authorfont.render("Art by Doug Wu", True,BLACK)
+            authors = Authorfont.render("Albert Lo", True, BLACK)
+            illustrator = Authorfont.render("Player Sprite Art by Doug Wu", True,BLACK)
             screen.blit(authors, [60,150])
             screen.blit(illustrator, [60,175])
 
@@ -301,13 +306,34 @@ def main():
         elif choose_character:
             screen.fill(RED)
 
+            instruct = Authorfont.render("Instructions: ",True, BLACK)
+            instructions = Namefont.render("Use the arrows keys to move and spacebar to fire projectiles. ",True,BLACK)
+            
             name = Namefont.render(Alby.name, True, BLACK)
             Alby.spin(screen)
-            screen.blit(name,[285, 345])
+            screen.blit(instruct, [10,10])
+            screen.blit(instructions, [10,40])
+            screen.blit(name,[260, 305])
             
 
         # Regular gameplay
+        elif(end_scene):
+            screen.fill(RED)
+            point_print = Namefont.render("Number of zombies killed: " +str(points) ,True,BLACK)
+            screen.blit(point_print, [10, 10])
+            
         else:
+            if (time_indexer == 0):
+                for i in range(indexer):
+                    test = Zombie()
+                    while(test.rect.x - Alby.rect.x < 25 and test.rect.y - Alby.rect.y < 25):
+                        test.rect.x = random.uniform(0.0,700) # x
+                        test.rect.y = random.uniform(0.0,500) # y
+                    zombie_list.add(Zombie())
+                indexer += 1
+            time_indexer += 1
+            if(time_indexer > 200):
+                time_indexer = 0
             screen.fill(WHITE)
             Alby.update_pos(screen,keys_pressed)
             fire_list.update()
@@ -315,12 +341,17 @@ def main():
             zombie_list.update(Alby.rect)
             zombie_list.draw(screen)
         
-            pygame.sprite.groupcollide(zombie_list, fire_list,True,True)
+            hit_list = pygame.sprite.groupcollide(zombie_list, fire_list,True,True)
 
+            for i in hit_list:
+                points += 1
+            
+            
             for zombie in zombie_list:
                 if Alby.rect.colliderect(zombie):
                     print("YOU LOSE!")
-                    done = True
+                    end_scene = True
+                    continue
      
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()

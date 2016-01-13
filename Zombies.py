@@ -227,6 +227,7 @@ def main():
 
     #background img
     background_img = pygame.image.load("zombie.png").convert()
+    gameplaybackground_img = pygame.image.load("sand.png").convert()
 
     #init the sprite groups
     Alby = Albert();
@@ -270,13 +271,14 @@ def main():
                 elif event.key == pygame.K_LEFT:
                     Alby.direction = 3
                 elif event.key == pygame.K_SPACE:
+                    num_fired += 1
                     if Alby.direction == IDLE:
                         fire = Projectile(Alby.rect,Alby.prev)
                         fire_list.add(fire)
                     else:    
                         fire = Projectile(Alby.rect,Alby.direction)
                         fire_list.add(fire)
-                        num_fired += 1
+                    
 
             keys_pressed = pygame.key.get_pressed()      
 
@@ -285,7 +287,7 @@ def main():
             screen.blit(background_img, [0,0])
             #flickr is used to control how fast the text flashes
             if flickr_count < 20:
-                start = Startfont.render("Hit Start to Play",True, WHITE) 
+                start = Startfont.render("Hit Start to Play", True, WHITE) 
                 screen.blit(start,[75,400])
                 flickr_count += 1
             else:
@@ -330,7 +332,7 @@ def main():
             if num_fired == 0:
                 accuracy = 0.0
             else:
-                accuracy = (points/num_fired) * 100
+                accuracy = (points/num_fired)
             
             accuracy = Namefont.render("Accuracy: " + str(accuracy) ,True,BLACK)
             restart_print = Namefont.render("Hit enter to try again", True, WHITE)
@@ -370,7 +372,7 @@ def main():
             if(time_indexer > 200):
                 #time_indexer controls how much time is between zombie spawns
                 time_indexer = 0
-            screen.fill(WHITE)
+            screen.blit(gameplaybackground_img, [0,0])
             Alby.update_pos(screen,keys_pressed)
             fire_list.update()
             fire_list.draw(screen)

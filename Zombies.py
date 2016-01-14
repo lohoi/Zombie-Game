@@ -271,7 +271,8 @@ def main():
                 elif event.key == pygame.K_LEFT:
                     Alby.direction = 3
                 elif event.key == pygame.K_SPACE:
-                    num_fired += 1
+                    if (not end_scene):
+                        num_fired += 1
                     if Alby.direction == IDLE:
                         fire = Projectile(Alby.rect,Alby.prev)
                         fire_list.add(fire)
@@ -296,7 +297,7 @@ def main():
                     flickr_count = 0
 
             # Title page text
-            title = Titlefont.render("Zombie Game",True, BLACK)
+            title = Titlefont.render("Nite Krawlerz",True, BLACK)
             screen.blit(title, [60, 100])
             authors = Authorfont.render("Created by Chris Quinones and Albert Lo", True, BLACK)
             illustrator = Authorfont.render("Player Sprite Art by Doug Wu", True,BLACK)
